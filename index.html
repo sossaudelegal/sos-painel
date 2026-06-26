@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoS Advogados — Painel de Acompanhamento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --teal:#15957E;--teal-dark:#0d6b5a;--teal-light:#e8f5f2;
+  --green-dark:#435C2F;--green-med:#8BBD64;--green-light:#f0f7e6;
+  --ice:#F0F9FF;--white:#ffffff;
+  --text:#1a2e1a;--text2:#3d5a3d;--text3:#6b8f6b;
+  --border:rgba(21,149,126,0.15);--border2:rgba(21,149,126,0.25);
+  --red:#c0392b;--red-bg:#fdf0ef;
+  --amber:#8a5a00;--amber-bg:#fdf5e6;
+  --font:'Poppins',system-ui,sans-serif;
+  --r:10px;--r-sm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ice);font-family:var(--font);color:var(--text);font-size:14px;line-height:1.6}
+
+/* LOGIN */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2rem;padding:2rem;background:linear-gradient(135deg,var(--ice) 0%,#e0f2ec 100%)}
+.login-wrap{background:var(--white);border-radius:16px;padding:3rem 2.5rem;width:100%;max-width:400px;text-align:center;box-shadow:0 4px 32px rgba(21,149,126,0.10)}
+.login-logo{margin-bottom:1.5rem}
+.sos-mark{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:16px;background:var(--green-med);margin-bottom:.75rem;font-family:var(--font);font-size:22px;font-weight:700;color:#fff;letter-spacing:-.5px}
+.login-brand{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:.25rem}
+.login-title{font-size:22px;font-weight:600;color:var(--green-dark);margin-bottom:.25rem}
+.login-sub{font-size:13px;color:var(--text3);margin-bottom:2rem;font-style:italic}
+.login-lema{font-size:12px;color:var(--teal);font-weight:500;margin-bottom:2rem;padding:.75rem 1rem;background:var(--teal-light);border-radius:var(--r-sm);border-left:3px solid var(--teal)}
+input[type=password]{width:100%;padding:11px 14px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:14px;font-family:var(--font);outline:none;color:var(--text);background:var(--ice);transition:border .2s}
+input[type=password]:focus{border-color:var(--teal)}
+.btn{width:100%;padding:11px;background:var(--teal);color:#fff;border:none;border-radius:var(--r-sm);font-size:14px;font-weight:500;font-family:var(--font);cursor:pointer;margin-top:10px;transition:background .2s}
+.btn:hover{background:var(--teal-dark)}
+.err{font-size:12px;color:var(--red);margin-top:8px;display:none}
+.login-footer{font-size:11px;color:var(--text3);text-align:center}
+
+/* TOPBAR */
+#main{display:none}
+.topbar{background:var(--green-dark);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:100}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-logo{display:flex;align-items:center;justify-content:center;width:32px;height:32px;background:var(--green-med);border-radius:8px;flex-shrink:0;font-family:var(--font);font-size:12px;font-weight:700;color:#fff;letter-spacing:-.5px}
+.topbar-name{font-size:13px;font-weight:600;color:#fff;letter-spacing:.02em}
+.topbar-name span{font-weight:300;opacity:.65}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-lema{font-size:11px;color:rgba(255,255,255,.55);font-style:italic;display:none}
+.topbar-date{font-size:11px;color:rgba(255,255,255,.5)}
+.btn-out{font-size:11px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:none;padding:4px 10px;border-radius:20px;cursor:pointer;font-family:var(--font);transition:background .2s}
+.btn-out:hover{background:rgba(255,255,255,.2)}
+
+/* NAV */
+.nav{background:var(--white);border-bottom:1px solid var(--border);display:flex;padding:0 2rem;overflow-x:auto}
+.nav-t{font-size:13px;padding:14px 16px;cursor:pointer;color:var(--text3);border-bottom:2.5px solid transparent;white-space:nowrap;font-weight:500;transition:all .15s}
+.nav-t:hover{color:var(--text2)}
+.nav-t.on{color:var(--teal);border-bottom-color:var(--teal)}
+
+/* PAGES */
+.page{display:none;padding:2rem;max-width:1100px;margin:0 auto}
+.page.on{display:block}
+
+/* TYPOGRAPHY */
+.sec-t{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.page-intro{font-size:14px;color:var(--text2);line-height:1.8;background:var(--white);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:1.5rem;border-left:4px solid var(--teal)}
+.page-intro strong{color:var(--teal);font-weight:600}
+
+/* METRICS */
+.grid-m{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.5rem}
+.m-card{background:var(--white);border-radius:var(--r);padding:1rem 1.25rem;border:1px solid var(--border);display:flex;flex-direction:column;justify-content:flex-start;min-height:88px}
+.m-label{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;line-height:1.3}
+.m-val{font-size:22px;font-weight:600;line-height:1.15;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-val-money{font-size:15px!important;font-weight:600;white-space:nowrap}
+.m-sub{font-size:10px;color:var(--text3)}
+
+/* BADGE */
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
+.b-fav{background:var(--teal-light);color:var(--teal)}
+.b-par{background:var(--amber-bg);color:var(--amber)}
+.b-cur{background:#e8f0fb;color:#1a56a0}
+.b-naj{background:#f1f0eb;color:#6b6b6b}
+
+/* PILL */
+.pill{display:inline-block;font-size:10px;font-weight:500;padding:1px 7px;border-radius:4px}
+.p-c{background:#e6f7ee;color:#155724}
+.p-r{background:var(--teal-light);color:var(--teal)}
+.p-d{background:var(--red-bg);color:var(--red)}
+.p-i{background:var(--amber-bg);color:var(--amber)}
+.p-e{background:#f1f0eb;color:#6b6b6b}
+
+/* TABELA */
+.tbl-w{overflow-x:auto;background:var(--white);border-radius:var(--r);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;background:var(--ice)}
+td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--ice);cursor:pointer}
+.td-r{text-align:right;font-family:monospace;font-size:12px;white-space:nowrap}
+
+/* CHARTS */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:1.5rem}
+.chart-box{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:1.25rem}
+.chart-title{font-size:12px;font-weight:600;color:var(--green-dark);margin-bottom:1rem}
+.chart-wrap{position:relative;height:220px}
+@media(max-width:640px){.charts-row{grid-template-columns:1fr}}
+
+/* BARRA IMPACTO */
+.impact-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.impact-name{font-size:12px;color:var(--text2);width:130px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.impact-bars{flex:1;display:flex;flex-direction:column;gap:3px}
+.bar-track{background:rgba(21,149,126,.1);border-radius:3px;height:7px;overflow:hidden;width:100%}
+.bar-fill{height:100%;border-radius:3px}
+.bar-rec{background:var(--teal)}
+.bar-recup{background:var(--amber-bg);border:1px solid var(--amber)}
+.impact-vals{font-size:10px;font-family:monospace;color:var(--text3);width:70px;text-align:right;flex-shrink:0}
+
+/* OVERLAY DETALHE */
+.overlay{display:none;position:fixed;inset:0;background:rgba(26,46,26,.4);z-index:200;align-items:flex-start;justify-content:flex-end;padding:1rem}
+.overlay.on{display:flex}
+.detail{background:var(--white);border-radius:var(--r);width:500px;max-width:100%;max-height:calc(100vh - 2rem);overflow-y:auto;padding:1.75rem}
+.det-close{position:absolute;top:1rem;right:1rem;background:var(--ice);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--text2);display:flex;align-items:center;justify-content:center}
+.det-name{font-size:20px;font-weight:600;color:var(--green-dark);margin-bottom:3px}
+.det-op{font-size:12px;color:var(--text3);margin-bottom:1.25rem}
+.det-sec{margin-bottom:1.25rem}
+.det-sec-t{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.det-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dg{background:var(--ice);border-radius:var(--r-sm);padding:9px 11px}
+.dg-l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.dg-v{font-size:14px;font-weight:600;font-family:monospace}
+.alerta{border-radius:var(--r-sm);padding:10px 13px;margin-bottom:8px;border-left:3px solid}
+.al-l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.al-t{font-size:12px;line-height:1.6;color:var(--text)}
+.a-ok{background:var(--teal-light);border-color:var(--teal)}.a-ok .al-l{color:var(--teal)}
+.a-urg{background:var(--red-bg);border-color:var(--red)}.a-urg .al-l{color:var(--red)}
+.a-info{background:var(--amber-bg);border-color:#d4920a}.a-info .al-l{color:var(--amber)}
+.a-note{background:#e8f0fb;border-color:#378add}.a-note .al-l{color:#1a56a0}
+.proc-item{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start}
+.proc-tag{flex-shrink:0;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;border:1px solid;margin-top:2px}
+.proc-txt{font-size:12px;color:var(--text2);line-height:1.5}
+.t-lim1{background:#e6f7ee;color:#155724;border-color:#5DCAA5}
+.t-lim2{background:var(--green-light);color:var(--green-dark);border-color:var(--green-med)}
+.t-sent{background:#e8f0fb;color:#1a56a0;border-color:#85B7EB}
+.t-acfav{background:#f0eefe;color:#4a3db0;border-color:#AFA9EC}
+.t-acdef{background:var(--red-bg);color:var(--red);border-color:#F09595}
+.t-acpar{background:var(--amber-bg);color:var(--amber);border-color:#EF9F27}
+
+/* GLOSSÁRIO */
+.glossario{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+.gloss-item{background:var(--white);border-radius:var(--r);padding:1rem 1.25rem;border:1px solid var(--border)}
+.gloss-term{font-size:13px;font-weight:600;color:var(--teal);margin-bottom:4px}
+.gloss-def{font-size:12px;color:var(--text2);line-height:1.6}
+@media(max-width:640px){.glossario{grid-template-columns:1fr}}
+
+/* SEGURANÇA JURÍDICA */
+.jur-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:1.5rem}
+.jur-card{background:var(--white);border-radius:var(--r);padding:1.25rem;border:1px solid var(--border);text-align:center}
+.jur-n{font-size:36px;font-weight:600;line-height:1;margin-bottom:4px}
+.jur-l{font-size:12px;color:var(--text2);line-height:1.4}
+.jur-sub{font-size:10px;color:var(--text3);margin-top:4px}
+.turma-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.turma-item:last-child{border-bottom:none}
+.turma-name{font-size:13px;font-weight:500}
+.turma-rel{font-size:11px;color:var(--text3);margin-top:1px}
+
+/* RA TABLE */
+.ra-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.ra-item:last-child{border-bottom:none}
+.ra-name{font-size:13px;font-weight:500;width:160px;flex-shrink:0}
+.ra-bars{flex:1;display:flex;gap:5px;align-items:center}
+.ra-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ra-dot-fav{background:var(--teal)}
+.ra-dot-par{background:#EF9F27}
+.ra-dot-def{background:var(--red)}
+.ra-count{font-size:11px;color:var(--text3)}
+.ra-adv{font-size:10px;background:var(--teal-light);color:var(--teal);padding:1px 7px;border-radius:10px;font-weight:500}
+
+/* DISCLAIMER */
+.disc{font-size:11px;color:var(--text3);background:var(--white);border-radius:var(--r-sm);padding:10px 14px;margin-top:1.5rem;line-height:1.6;border:1px solid var(--border)}
+.disc strong{color:var(--text2);font-weight:600}
+
+/* FOOTER */
+.footer{text-align:center;padding:2rem;font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:2rem}
+.footer strong{color:var(--teal);font-weight:600}
+
+@media(max-width:600px){
+  .page{padding:1rem}
+  .topbar,.nav{padding:0 1rem}
+  .topbar-lema{display:none}
+  .charts-row,.det-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <div class="sos-mark">SoS</div>
+      <div class="login-brand">SoS Advogados</div>
+    </div>
+    <div class="login-title">Painel de Acompanhamento</div>
+    <div class="login-sub">jun/2026</div>
+    <div class="login-lema">"Prevenir, remediar, sobretudo, esclarecer."</div>
+    <input type="password" id="pwd" placeholder="Senha de acesso" onkeydown="if(event.key==='Enter')login()">
+    <button class="btn" onclick="login()">Acessar</button>
+    <div class="err" id="err">Senha incorreta.</div>
+  </div>
+  <div class="login-footer">Silva Filho · Seiffert &amp; Silva · Brasília-DF</div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">SoS</div>
+      <div>
+        <div class="topbar-name">SoS Advogados <span>· Silva Filho</span></div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-lema" style="display:block">"Prevenir, remediar, sobretudo, esclarecer."</div>
+      <div class="topbar-date">jun/2026</div>
+      <button class="btn-out" onclick="logout()">Sair</button>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-t on" onclick="tab('geral',this)">Visão geral</div>
+    <div class="nav-t" onclick="tab('pacientes',this)">Por paciente</div>
+    <div class="nav-t" onclick="tab('valores',this)">Valores &amp; impacto</div>
+    <div class="nav-t" onclick="tab('seguranca',this)">Segurança jurídica</div>
+    <div class="nav-t" onclick="tab('glossario',this)">Glossário</div>
+  </div>
+
+  <!-- VISÃO GERAL -->
+  <div class="page on" id="pg-geral">
+    <div class="page-intro">
+      Este painel foi preparado pelo escritório <strong>Silva Filho · SoS Advogados</strong> para acompanhamento dos pacientes junto às operadoras de saúde. Ele reúne, em linguagem acessível, a situação de cada processo judicial, o histórico de reembolsos e o impacto financeiro concreto da intervenção jurídica. Atualizado mensalmente.
+    </div>
+    <div class="sec-t">Resumo executivo</div>
+    <div class="grid-m" id="met-geral"></div>
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">Situação dos processos</div>
+        <div class="chart-wrap"><canvas id="chart-status"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Cartas de resultado — distribuição</div>
+        <div class="chart-wrap"><canvas id="chart-crs"></canvas></div>
+      </div>
+    </div>
+    <div class="sec-t">Operadoras envolvidas</div>
+    <div class="grid-m" id="met-ops"></div>
+    <div class="disc">
+      <strong>Nota sobre os dados financeiros:</strong> os valores apresentados são apurados com base nas cartas de resultado fornecidas pela gestora de reembolso. Pacientes com valor R$ 0,00 indicam pendência de atualização pela gestora. Os dados são validados pelo escritório e podem ser objeto de correção.
+    </div>
+  </div>
+
+  <!-- POR PACIENTE -->
+  <div class="page" id="pg-pacientes">
+    <div class="page-intro">
+      A tabela abaixo mostra todos os pacientes acompanhados pelo escritório. <strong>Clique em qualquer linha</strong> para ver o detalhamento completo: situação judicial, histórico de cartas de resultado e análise das providências em curso.
+    </div>
+    <div class="tbl-w">
+      <table><thead><tr>
+        <th>Paciente</th><th>Operadora</th><th>Status judicial</th>
+        <th>CRs</th><th class="td-r">Recuperado</th><th class="td-r">Recuperável</th>
+      </tr></thead>
+      <tbody id="tbody-pac"></tbody></table>
+    </div>
+  </div>
+
+  <!-- VALORES & IMPACTO -->
+  <div class="page" id="pg-valores">
+    <div class="page-intro">
+      <strong>Valor recuperado</strong> é o montante que as operadoras passaram a reembolsar corretamente após as decisões judiciais. <strong>Valor recuperável</strong> é o saldo ainda em aberto nas cartas descumpridas — alvo das próximas reapresentações.
+    </div>
+    <div class="sec-t" style="margin-bottom:1rem">Impacto por paciente — recuperado vs. recuperável</div>
+    <div id="impact-chart"></div>
+    <div class="charts-row" style="margin-top:1.5rem">
+      <div class="chart-box" style="grid-column:1/-1">
+        <div class="chart-title">Evolução dos valores recuperados ao longo do tempo</div>
+        <div class="chart-wrap" style="height:260px"><canvas id="chart-timeline"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row" style="margin-top:1rem">
+      <div class="chart-box" style="grid-column:1/-1">
+        <div class="chart-title">Antes e após a decisão judicial — reembolso original vs. recuperado</div>
+        <div class="chart-wrap"><canvas id="chart-antes-depois"></canvas></div>
+      </div>
+    </div>
+    <div class="grid-m" id="met-valores"></div>
+    <div class="disc">Os valores recuperados correspondem ao reembolso efetivo obtido após cumprimento ou regularização das cartas de resultado, conforme planilha da gestora. Valores em apuração serão incorporados nas próximas atualizações.</div>
+  </div>
+
+  <!-- SEGURANÇA JURÍDICA -->
+  <div class="page" id="pg-seguranca">
+    <div class="page-intro">
+      Esta seção apresenta um panorama do entendimento dos tribunais sobre reembolso de hemodiálise. O escritório acompanha ativamente a formação dessa jurisprudência — tanto por meio de seus próprios casos quanto pelo monitoramento de decisões de terceiros — para oferecer a seus clientes segurança jurídica baseada em dados reais.
+    </div>
+    <div class="sec-t">Panorama geral</div>
+    <div class="jur-grid" id="jur-nums"></div>
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">Resultado das decisões em 2ª instância</div>
+        <div class="chart-wrap"><canvas id="chart-jur-res"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Silva Filho vs. demais advogados (2ª inst.)</div>
+        <div class="chart-wrap"><canvas id="chart-jur-adv"></canvas></div>
+      </div>
+    </div>
+    <div class="sec-t" style="margin-top:.5rem">1ª instância — segurança por comarca <span style="font-size:10px;font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">clique para expandir</span></div>
+    <div id="ra-geo"></div>
+    <div class="sec-t" style="margin-top:1rem">2ª instância — posicionamento por turma</div>
+    <div id="turmas-sec"></div>
+    <div class="sec-t" style="margin-top:1rem">Argumentos centrais consolidados</div>
+    <div id="args-list"></div>
+    <div class="disc"><strong>Nota:</strong> as decisões favoráveis são ao beneficiário/paciente. A tendência favorável nos tribunais garante que os pacientes poderão exigir o reembolso correto judicialmente, reduzindo o risco financeiro para a clínica.</div>
+  </div>
+
+  <!-- GLOSSÁRIO -->
+  <div class="page" id="pg-glossario">
+    <div class="page-intro">
+      Para facilitar o acompanhamento, reunimos aqui os termos jurídicos e técnicos que aparecem neste painel, em linguagem simples e direta.
+    </div>
+    <div class="sec-t">Termos jurídicos</div>
+    <div class="glossario" id="gloss"></div>
+  </div>
+
+  <div class="footer">
+    <strong>SoS Advogados · Silva Filho</strong><br>
+    Seiffert &amp; Silva Advocacia · Brasília-DF<br>
+    <em style="font-size:10px">"Prevenir, remediar, sobretudo, esclarecer."</em>
+    <div style="margin-top:10px;font-size:11px;color:var(--text3);background:var(--teal-light);border-radius:var(--r-sm);padding:8px 14px;display:inline-block">
+      <strong style="color:var(--teal)">Atualização mensal</strong> — Este painel é revisado e atualizado pelo escritório a cada 30 dias. Última atualização: <strong style="color:var(--teal)">junho/2026</strong>. Em caso de dúvidas, entre em contato diretamente com o Dr. Silva Filho.
+    </div>
+  </div>
+</div>
+
+<!-- DETALHE -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeD()">
+  <div class="detail" style="position:relative">
+    <button class="det-close" onclick="closeD()">✕</button>
+    <div id="det-content"></div>
+  </div>
+</div>
+
+<script>
+const PWD='renalmais2026';
+function login(){const v=document.getElementById('pwd').value.trim();if(v===PWD){document.getElementById('login').style.display='none';document.getElementById('main').style.display='block';build()}else{document.getElementById('err').style.display='block'}}
+function logout(){document.getElementById('main').style.display='none';document.getElementById('login').style.display='flex';document.getElementById('pwd').value='';document.getElementById('err').style.display='none'}
+function tab(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav-t').forEach(t=>t.classList.remove('on'));document.getElementById('pg-'+id).classList.add('on');el.classList.add('on')}
+
+const SL={fav:{cls:'b-fav',l:'Favorável'},par:{cls:'b-par',l:'Parcial'},cur:{cls:'b-cur',l:'Em curso'},naj:{cls:'b-naj',l:'A ajuizar'}};
+const fmt=v=>v>0?'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
+const fmtk=v=>v>0?'R$ '+(v/1000).toFixed(0)+'k':'—';
+
+const PACS=[
+  {nome:'Nelma Rodrigues',op:'Bradesco',status:'fav',ra:'Planaltina',vara:'Planaltina',proc:'0708267-59.2025.8.07.0005',vRec:1187623.69,vRecup:926036.39,vGlosa:173647.16,crs:{total:54,cumpridas:3,regularizadas:17,descumpridas:32,irregulares:0,espera:0,semSit:2},decs:[{t:'t-lim1',l:'Liminar 1ª inst.',tx:'Tutela deferida (jul/2025): reembolso por Brasíndice/Simpro, vedado código genérico. Multa = triplo do valor negado.'},{t:'t-sent',l:'Sentença',tx:'Aguarda prolação — memoriais apresentados.'}],analise:[{t:'a-ok',titulo:'R$ 1,18M recuperado',tx:'Após reiteração da ordem (mai/2026), Bradesco regularizou 17 CRs e passou a reembolsar em conta aberta. 3 CRs já vieram cumpridas diretamente.'},{t:'a-urg',titulo:'32 CRs ainda descumpridas',tx:'Bradesco manteve empacotamento nas CRs de nov/2024 a jul/2025. Nova reapresentação com reiteração da ordem está em preparação. Potencial: R$ 926k.'},{t:'a-info',titulo:'2 CRs recentes',tx:'CRs de mai–jun/2026 aguardam resposta da operadora.'}]},
+  {nome:'Luccas Passaglia',op:'Bradesco',status:'fav',ra:'Núcleo Bandeirante',vara:'Núcleo Bandeirante',proc:'0703328-18.2025.8.07.0011',vRec:2594532.81,vRecup:65036.75,vGlosa:288161.59,crs:{total:98,cumpridas:0,regularizadas:83,descumpridas:2,irregulares:0,espera:13,semSit:0},decs:[{t:'t-lim2',l:'Acórdão em AI',tx:'Ac. 2101142 (5ª T. | Lucimeira, mar/2026): AI provido. Multa R$ 1.000/dia.'},{t:'t-sent',l:'Sentença',tx:'Procedência em 12/06/2026. Bradesco no prazo de apelação.'}],analise:[{t:'a-ok',titulo:'R$ 2,59M recuperado — maior da carteira',tx:'83 CRs regularizadas. O caso Luccas demonstra o pleno impacto da intervenção judicial sobre o Bradesco.'},{t:'a-note',titulo:'Continuidade processual',tx:'Óbito do paciente registrado após o acórdão. A ação prossegue pelo espólio/herdeiros.'}]},
+  {nome:'Valdomiro Florencio',op:'Bradesco',status:'fav',ra:'Ceilândia',vara:'Ceilândia',proc:'0735696-07.2025.8.07.0003',vRec:15358.32,vRecup:0,vGlosa:0,crs:{total:18,cumpridas:0,regularizadas:4,descumpridas:6,irregulares:0,espera:0,semSit:0},decs:[{t:'t-lim1',l:'Liminar 1ª inst.',tx:'Tutela deferida: vedado código 151, UR/CR ou pacotes genéricos. Multa R$ 5.000.'}],analise:[{t:'a-ok',titulo:'4 CRs regularizadas',tx:'Inicio de cumprimento após a decisão.'},{t:'a-info',titulo:'6 CRs descumpridas',tx:'Valores em atualização pela gestora.'}]},
+  {nome:'André Bravim',op:'Sul América',status:'fav',ra:'Núcleo Bandeirante',vara:'Núcleo Bandeirante',proc:'0704039-23.2025.8.07.0011',vRec:105267.55,vRecup:0,vGlosa:0,crs:{total:82,cumpridas:0,regularizadas:13,descumpridas:16,irregulares:24,espera:29,semSit:5},decs:[{t:'t-lim1',l:'Liminar 1ª inst.',tx:'Discriminação item a item exigida. Pena: R$ 30k por demonstrativo irregular.'},{t:'t-sent',l:'Sentença',tx:'Procedência. Sul América recorreu (15/06/2026).'}],analise:[{t:'a-ok',titulo:'R$ 105k recuperado',tx:'13 CRs regularizadas.'},{t:'a-urg',titulo:'Apelação Sul América em curso',tx:'Contrarrazões em elaboração pelo escritório. Sentença favorável está mantida.'}]},
+  {nome:'Ruither Jacques',op:'Sul América',status:'par',ra:'Brasília',vara:'Brasília',proc:'0730083-12.2025.8.07.0001',vRec:0,vRecup:0,vGlosa:0,crs:{total:66,cumpridas:0,regularizadas:0,descumpridas:0,irregulares:47,espera:16,semSit:0},decs:[{t:'t-acpar',l:'Acórdão AI (parcial)',tx:'Ac. 2083642 (Aiston): dever de discriminar reconhecido.'},{t:'t-acpar',l:'Acórdão AC (parcial)',tx:'Ac. 2123093: confirmou o dever mas não condenou. Embargos pendentes.'}],analise:[{t:'a-note',titulo:'Decisão parcialmente favorável',tx:'O tribunal reconheceu que a Sul América violou o contrato. Os embargos visam converter esse reconhecimento em condenação ao pagamento.'},{t:'a-info',titulo:'47 CRs irregulares aguardam',tx:'Valores serão apurados após o trânsito dos embargos.'}]},
+  {nome:'Oscar Karlatopoulos',op:'Amil',status:'cur',ra:'Brasília',vara:'Brasília',proc:'0742129-33.2025.8.07.0001',vRec:0,vRecup:0,vGlosa:0,crs:{total:79,cumpridas:0,regularizadas:0,descumpridas:0,irregulares:22,espera:55,semSit:0},decs:[{t:'t-acdef',l:'AI — sem tutela vigente',tx:'Ac. 2106767 (Sandra Reves): tutela negada. Perícia judicial ordenada.'}],analise:[{t:'a-info',titulo:'Perícia judicial em andamento',tx:'O laudo pericial demonstrará o subdimensionamento da Amil. Sem decisão liminar por ora.'},{t:'a-note',titulo:'Estratégia: laudo + sentença',tx:'A ausência de liminar é conjuntural. A sentença, embasada na perícia, tende a ser favorável.'}]},
+  {nome:'Antonio de Padua',op:'Cassi',status:'fav',ra:'Brasília',vara:'Brasília',proc:'0736445-30.2025.8.07.0001',vRec:0,vRecup:0,vGlosa:0,crs:{total:36,cumpridas:0,regularizadas:0,descumpridas:0,irregulares:21,espera:15,semSit:0},decs:[{t:'t-acfav',l:'Acórdão em apelação',tx:'Ac. 2112192 (Ciarlini, abr/2026): cláusula duvidosa favorece o aderente. Reembolso por Brasíndice/Simpro garantido.'}],analise:[{t:'a-ok',titulo:'Vitória no tribunal — Cassi',tx:'Decisão importante: mesmo que o CDC não se aplique (Cassi é autogestão), a cláusula ambígua é interpretada em favor do beneficiário.'},{t:'a-info',titulo:'Cassi recorreu ao STJ',tx:'Contrarrazões em preparação. O escritório monitorará o julgamento.'}]},
+  {nome:'Cláudio Oliveira',op:'Cassi',status:'naj',ra:'Planaltina',vara:'—',proc:'Em ajuizamento',vRec:0,vRecup:0,vGlosa:0,crs:{total:105,cumpridas:0,regularizadas:0,descumpridas:0,irregulares:66,espera:3,semSit:11},decs:[],analise:[{t:'a-note',titulo:'Ação a ser ajuizada',tx:'Petição em elaboração. Base jurídica: Ac. 2112192 (Cassi) já disponível como paradigma direto.'},{t:'a-info',titulo:'66 CRs irregulares mapeadas',tx:'Grande volume identificado. A ação cobrirá todo o histórico.'}]},
+  {nome:'Ailson Silva',op:'Bradesco',status:'fav',ra:'TJGO',vara:'Cidade Ocidental',proc:'5083550-61.2026.8.09.0164',vRec:0,vRecup:0,vGlosa:0,crs:{total:15,cumpridas:0,regularizadas:0,descumpridas:0,irregulares:14,espera:0,semSit:1},decs:[{t:'t-lim2',l:'Acórdão AI (TJGO)',tx:'Altair Guerra (mai/2026): código 151 abusivo. Brasíndice/Simpro exigido. Autonomia do médico reconhecida.'}],analise:[{t:'a-ok',titulo:'Decisão mais completa da carteira',tx:'O TJGO foi além: declarou o pacote abusivo, garantiu a conta aberta E reconheceu que só o médico define o tratamento — a operadora não pode substituir.'}]},
+  {nome:'Aluísio Nei Franca',op:'Bradesco',status:'fav',ra:'TJGO',vara:'Formosa',proc:'5915650-42.2025.8.09.0044',vRec:0,vRecup:0,vGlosa:0,crs:{total:37,cumpridas:0,regularizadas:0,descumpridas:0,irregulares:18,espera:0,semSit:7},decs:[{t:'t-lim1',l:'Liminar 1ª inst.',tx:'Tutela parcial deferida — Formosa/GO.'},{t:'t-acfav',l:'PAP transitada',tx:'Bradesco não apresentou documentos: confissão ficta reconhecida.'}],analise:[{t:'a-ok',titulo:'Confissão ficta do Bradesco',tx:'Estratégia processual: a produção antecipada de provas forçou o Bradesco a uma situação em que o silêncio equivale a admitir as irregularidades.'}]},
+  {nome:'Vanessa Pereira',op:'Bradesco',status:'fav',ra:'São Sebastião',vara:'São Sebastião',proc:'0703032-56.2026.8.07.0012',vRec:0,vRecup:0,vGlosa:0,crs:{total:16,cumpridas:0,regularizadas:0,descumpridas:0,irregulares:16,espera:0,semSit:0},decs:[{t:'t-lim1',l:'Liminar 1ª inst.',tx:'Tutela deferida em 29/05/2026 após reconsideração.'}],analise:[{t:'a-ok',titulo:'Liminar obtida',tx:'Processo recente — decisão vigente. Bradesco citado.'}]},
+  {nome:'Raysa do Carmo',op:'Sul América',status:'fav',ra:'Gama',vara:'Gama',proc:'0707048-77.2026.8.07.0004',vRec:0,vRecup:0,vGlosa:0,crs:{total:8,cumpridas:0,regularizadas:0,descumpridas:0,irregulares:6,espera:0,semSit:2},decs:[{t:'t-lim1',l:'Liminar 1ª inst.',tx:'Tutela deferida (18/05/2026): conta aberta, item a item.'}],analise:[{t:'a-ok',titulo:'Liminar obtida',tx:'Sul América contestou (10/06/2026). Réplica em elaboração.'},{t:'a-urg',titulo:'Argumento Nefrostar na contestação',tx:'A Sul América tentou usar questões societárias da clínica para desviar o foco. O escritório rebaterá esse argumento isolando-o do descumprimento contratual.'}]},
+  {nome:'Eduardo Nunes',op:'Bradesco',status:'fav',ra:'Gama',vara:'Gama',proc:'0715469-90.2025.8.07.0004',vRec:0,vRecup:0,vGlosa:0,crs:{total:30,cumpridas:0,regularizadas:0,descumpridas:0,irregulares:12,espera:9,semSit:1},decs:[{t:'t-lim1',l:'Liminar 1ª inst.',tx:'Vedação expressa de código 151, média de rede e UR/CR. Memória de cálculo auditável exigida.'}],analise:[{t:'a-ok',titulo:'Liminar técnica e detalhada',tx:'A decisão fecha todos os "buracos" que o Bradesco usa para empacotar. Cada subterfúgio está expressamente proibido.'}]},
+  {nome:'Samuel Suaid',op:'Sul América + Amil',status:'fav',ra:'Brasília',vara:'Brasília',proc:'0764975-44.2025.8.07.0001',vRec:160156.76,vRecup:0,vGlosa:0,crs:{total:89,cumpridas:0,regularizadas:11,descumpridas:0,irregulares:2,espera:71,semSit:0},decs:[{t:'t-lim1',l:'Liminar 1ª inst. (Sul Am.)',tx:'Relatório pormenorizado exigido — discriminação total.'},{t:'t-acpar',l:'AI Sul América em julgamento',tx:'Sessão plenária jun/2026 — operadora pediu sustentação oral.'}],analise:[{t:'a-ok',titulo:'R$ 160k recuperado (Amil)',tx:'11 CRs regularizadas.'},{t:'a-note',titulo:'Dois processos simultâneos',tx:'Sul América: liminar vigente, sentença pendente. Amil: ação a protocolar em breve.'}]},
+  {nome:'Vera Ferreira',op:'Bradesco',status:'fav',ra:'Brasília',vara:'Brasília',proc:'0759202-18.2025.8.07.0001',vRec:0,vRecup:0,vGlosa:0,crs:{total:4,cumpridas:0,regularizadas:0,descumpridas:0,irregulares:4,espera:0,semSit:0},decs:[{t:'t-sent',l:'Sentença paradigma',tx:'Nulidade do pacote 151; reprocessamento por Brasíndice/Simpro; pagamento das diferenças + SELIC; vedação futura.'},{t:'t-acfav',l:'AI Bradesco desprovido',tx:'O Bradesco tentou suspender a sentença: negado.'}],analise:[{t:'a-ok',titulo:'Sentença paradigma — a mais completa',tx:'Esta decisão é o modelo: declara nula a alteração unilateral, exige reprocessamento, condena ao pagamento com correção monetária e proíbe o pacote no futuro.'}]}
+];
+
+const ACORDAOS=[
+  // CASOS SILVA FILHO — TJDFT
+  {num:'1863793',adv:'SF',turma:'5ª T.',rel:'Alfeu Machado',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AI',tese:'Alteração unilateral vedada — Brasíndice/Simpro exigido'},
+  {num:'1934307',adv:'SF',turma:'5ª T.',rel:'Carmen Bittencourt',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Reembolso integral exigido — urgência configurada'},
+  {num:'1937848',adv:'SF',turma:'2ª T.',rel:'Ciarlini',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Cláusula duvidosa interpretada pró-aderente (art. 423 CC)'},
+  {num:'1999695',adv:'SF',turma:'5ª T.',rel:'Vera Andrighi',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Comunicado 25/10/2023 declarado nulo — cláusula original preservada'},
+  {num:'2016295',adv:'SF',turma:'5ª T.',rel:'Eustáquio',res:'fav',ra:'Brasília',inst:'2ª',tipo:'ED',tese:'Embargos — manutenção da decisão favorável'},
+  {num:'2039813',adv:'SF',turma:'5ª T.',rel:'James',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Conta aberta exigida — pacote vedado'},
+  {num:'2051852',adv:'SF',turma:'5ª T.',rel:'Bessa',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Discriminação obrigatória de materiais e medicamentos'},
+  {num:'2078817',adv:'SF',turma:'5ª T.',rel:'Alfeu Machado',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AI',tese:'AI provido — tutela restabelecida'},
+  {num:'2083642',adv:'SF',turma:'4ª T.',rel:'Aiston',res:'par',ra:'Brasília',inst:'2ª',tipo:'AI',tese:'Pacote lícito mas dever de discriminar reconhecido'},
+  {num:'2101142',adv:'SF',turma:'5ª T.',rel:'Lucimeira',res:'fav',ra:'Núcleo Bandeirante',inst:'2ª',tipo:'AI',tese:'AI provido — Brasíndice/Simpro exigido. Multa R$ 1k/dia'},
+  {num:'2106767',adv:'SF',turma:'7ª T.',rel:'Sandra Reves',res:'def',ra:'Brasília',inst:'2ª',tipo:'AI',tese:'Tutela negada — dilação probatória necessária (Amil)'},
+  {num:'2112192',adv:'SF',turma:'2ª T.',rel:'Ciarlini',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Cassi — cláusula duvidosa favorece aderente (art. 423 CC)'},
+  {num:'2123093',adv:'SF',turma:'4ª T.',rel:'Aiston',res:'par',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Dever de discriminar confirmado — embargos pendentes'},
+  // CASO SILVA FILHO — TJGO
+  {num:'TJGO/Ailson',adv:'SF',turma:'1ª Câm.',rel:'Altair Guerra',res:'fav',ra:'TJGO — Cidade Ocidental',inst:'2ª',tipo:'AI',tese:'Código 151 abusivo — autonomia do médico assistente reconhecida'},
+  // CASOS TERCEIROS — TJDFT
+  {num:'2078510',adv:'3º',turma:'1ª T.',rel:'Fabrício Fontoura',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Operadora sem tabela contratual não pode limitar reembolso de materiais'},
+  {num:'2115494',adv:'3º',turma:'4ª T.',rel:'Sérgio Rocha',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Tabela contratual não apresentada: perde direito de limitar reembolso'},
+  {num:'2120053',adv:'3º',turma:'4ª T.',rel:'Aiston',res:'par',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Reembolso parcial — prescrição decenal confirmada'},
+  {num:'2107007',adv:'3º',turma:'8ª T.',rel:'Carmen',res:'par',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Reembolso integral apenas em urgência ou ausência de rede'},
+  {num:'2085680',adv:'3º',turma:'3ª T.',rel:'Luís Gustavo',res:'def',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Parto domiciliar — livre escolha sem reembolso integral'},
+  {num:'2091878',adv:'3º',turma:'1ª T.',rel:'Teófilo',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Prótese customizada — reembolso integral se rede incapaz'},
+  {num:'2056683',adv:'3º',turma:'1ª TR',rel:'Fernandes da Luz',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'CNES não exigível para reembolso de procedimentos'},
+  {num:'2054262',adv:'3º',turma:'2ª TR',rel:'Marília Sampaio',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'INAS/urgência — reembolso obrigatório + dano moral'},
+  {num:'2103020',adv:'3º',turma:'3ª TR',rel:'Margareth Becker',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'INAS/UTI + urgência — distingue Tema 1375 STJ'},
+  {num:'2129105',adv:'3º',turma:'8ª T.',rel:'Teófilo',res:'fav',ra:'Brasília',inst:'2ª',tipo:'AC',tese:'Tabela não apresentada: operadora perde direito de limitar'},
+  // CASOS TERCEIROS — TJDFT — 1ª INSTÂNCIA (comarcas relevantes)
+  {num:'0708267',adv:'SF',turma:'Vara Única',rel:'—',res:'fav',ra:'Planaltina',inst:'1ª',tipo:'Liminar',tese:'Liminar favorável — Bradesco. Vedado código 150/151'},
+  {num:'0703328',adv:'SF',turma:'Vara Única',rel:'—',res:'fav',ra:'Núcleo Bandeirante',inst:'1ª',tipo:'Liminar',tese:'Liminar e sentença — Bradesco. Código 150 abusivo'},
+  {num:'0735696',adv:'SF',turma:'1ª Vara',rel:'—',res:'fav',ra:'Ceilândia',inst:'1ª',tipo:'Liminar',tese:'Liminar favorável — Bradesco. Vedado pacote genérico'},
+  {num:'0715469',adv:'SF',turma:'2ª Vara',rel:'—',res:'fav',ra:'Gama',inst:'1ª',tipo:'Liminar',tese:'Liminar favorável — Bradesco. Vedação expressa código 151 + UR/CR'},
+  {num:'0707048',adv:'SF',turma:'1ª Vara',rel:'—',res:'fav',ra:'Gama',inst:'1ª',tipo:'Liminar',tese:'Liminar favorável — Sul América. Conta aberta exigida'},
+  {num:'0703032',adv:'SF',turma:'2ª Vara',rel:'—',res:'fav',ra:'São Sebastião',inst:'1ª',tipo:'Liminar',tese:'Liminar favorável — Bradesco (após reconsideração)'},
+  {num:'0736445',adv:'SF',turma:'23ª Vara',rel:'—',res:'fav',ra:'Brasília',inst:'1ª',tipo:'Sentença',tese:'Sentença + acórdão — Cassi. Cláusula duvidosa'},
+  {num:'0759202',adv:'SF',turma:'23ª Vara',rel:'—',res:'fav',ra:'Brasília',inst:'1ª',tipo:'Sentença',tese:'Sentença paradigma — Bradesco. Nulidade + reprocessamento + SELIC'},
+  {num:'0764975',adv:'SF',turma:'23ª Vara',rel:'—',res:'fav',ra:'Brasília',inst:'1ª',tipo:'Liminar',tese:'Liminar favorável — Sul América. Discriminação total exigida'},
+  {num:'0742129',adv:'SF',turma:'18ª Vara',rel:'—',res:'cur',ra:'Brasília',inst:'1ª',tipo:'Perícia',tese:'Perícia ordenada — Amil. Sem liminar vigente'},
+  {num:'0704039',adv:'SF',turma:'Vara Única',rel:'—',res:'fav',ra:'Núcleo Bandeirante',inst:'1ª',tipo:'Sentença',tese:'Liminar + sentença — Sul América. Discriminação item a item'},
+  {num:'0730083',adv:'SF',turma:'20ª Vara',rel:'—',res:'par',ra:'Brasília',inst:'1ª',tipo:'Sentença',tese:'Sentença parcial — Sul América. Dever de discriminar'},
+];
+
+function build(){
+  buildGeralMetrics();
+  buildChartStatus();
+  buildChartCRs();
+  buildOpsMetrics();
+  buildTabelaPac();
+  buildImpact();
+  buildChartTimeline();
+  buildChartAntesDepois();
+  buildValoresMetrics();
+  buildSeguranca();
+  buildGlossario();
+}
+
+function buildGeralMetrics(){
+  const tot=PACS.filter(p=>p.status!=='naj').length;
+  const fav=PACS.filter(p=>p.status==='fav').length;
+  const vR=PACS.reduce((a,p)=>a+p.vRec,0);
+  const vRp=PACS.reduce((a,p)=>a+p.vRecup,0);
+  const totCR=PACS.reduce((a,p)=>a+p.crs.total,0);
+  document.getElementById('met-geral').innerHTML=`
+    <div class="m-card"><div class="m-label">Processos ativos</div><div class="m-val">${tot}</div><div class="m-sub">em andamento</div></div>
+    <div class="m-card"><div class="m-label">Situação favorável</div><div class="m-val" style="color:var(--teal)">${fav}</div><div class="m-sub">decisão vigente</div></div>
+    <div class="m-card"><div class="m-label">Total de CRs</div><div class="m-val">${totCR}</div><div class="m-sub">cartas analisadas</div></div>
+    <div class="m-card"><div class="m-label">Recuperado</div><div class="m-val m-val-money" style="color:var(--teal)">${fmt(vR)}</div><div class="m-sub">valores apurados</div></div>
+    <div class="m-card"><div class="m-label">Recuperável</div><div class="m-val m-val-money" style="color:var(--red)">${fmt(vRp)}</div><div class="m-sub">descumpridas</div></div>
+  `;
+}
+
+function buildChartStatus(){
+  const fav=PACS.filter(p=>p.status==='fav').length;
+  const par=PACS.filter(p=>p.status==='par').length;
+  const cur=PACS.filter(p=>p.status==='cur').length;
+  const naj=PACS.filter(p=>p.status==='naj').length;
+  new Chart(document.getElementById('chart-status'),{type:'doughnut',data:{labels:['Situação favorável','Parcialmente favorável','Em curso (sem tutela)','A ajuizar'],datasets:[{data:[fav,par,cur,naj],backgroundColor:['#15957E','#EF9F27','#378ADD','#B4B2A9'],borderWidth:2,borderColor:'#fff',hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:11},padding:12,boxWidth:12}}}}});
+}
+
+function buildChartCRs(){
+  const tots={cumpridas:0,regularizadas:0,descumpridas:0,irregulares:0,espera:0};
+  PACS.forEach(p=>{tots.cumpridas+=p.crs.cumpridas;tots.regularizadas+=p.crs.regularizadas;tots.descumpridas+=p.crs.descumpridas;tots.irregulares+=p.crs.irregulares;tots.espera+=p.crs.espera});
+  new Chart(document.getElementById('chart-crs'),{type:'doughnut',data:{labels:['Cumpridas','Regularizadas (pós-decisão)','Descumpridas','Irregulares (sem ação ainda)','Aguardando CR'],datasets:[{data:[tots.cumpridas,tots.regularizadas,tots.descumpridas,tots.irregulares,tots.espera],backgroundColor:['#27500A','#15957E','#c0392b','#8a5a00','#B4B2A9'],borderWidth:2,borderColor:'#fff',hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10},padding:10,boxWidth:10}}}}});
+}
+
+function buildOpsMetrics(){
+  const ops={};
+  PACS.forEach(p=>{const o=p.op.split(' ')[0];ops[o]=(ops[o]||0)+1});
+  document.getElementById('met-ops').innerHTML=Object.entries(ops).map(([k,v])=>`<div class="m-card"><div class="m-label">${k}</div><div class="m-val">${v}</div><div class="m-sub">paciente${v>1?'s':''}</div></div>`).join('');
+}
+
+function buildTabelaPac(){
+  document.getElementById('tbody-pac').innerHTML=PACS.map((p,i)=>`
+    <tr onclick="openD(${i})">
+      <td><strong style="font-weight:500">${p.nome}</strong><div style="font-size:11px;color:var(--text3)">${p.vara}</div></td>
+      <td>${p.op}</td>
+      <td><span class="badge ${SL[p.status].cls}">${SL[p.status].l}</span></td>
+      <td><div style="font-size:12px;font-weight:500;margin-bottom:4px">${p.crs.total}</div><div style="display:flex;gap:3px;flex-wrap:wrap">${p.crs.regularizadas>0?`<span class="pill p-r">${p.crs.regularizadas} reg.</span>`:''} ${p.crs.descumpridas>0?`<span class="pill p-d">${p.crs.descumpridas} desc.</span>`:''} ${p.crs.irregulares>0?`<span class="pill p-i">${p.crs.irregulares} irreg.</span>`:''}</div></td>
+      <td class="td-r" style="color:${p.vRec>0?'var(--teal)':'var(--text3)'}">${p.vRec>0?fmt(p.vRec):'—'}</td>
+      <td class="td-r" style="color:${p.vRecup>0?'var(--red)':'var(--text3)'}">${p.vRecup>0?fmt(p.vRecup):'—'}</td>
+    </tr>`).join('');
+}
+
+function openD(i){
+  const p=PACS[i];
+  const s=SL[p.status];
+  const tmap={fav:'Totalmente favorável',par:'Parcialmente favorável',cur:'Em curso — sem tutela vigente',naj:'A ajuizar'};
+  const decs=p.decs.map(d=>`<div class="proc-item"><span class="proc-tag ${d.t}">${d.l}</span><span class="proc-txt">${d.tx}</span></div>`).join('');
+  const analise=p.analise.map(a=>`<div class="alerta ${a.t}"><div class="al-l">${a.titulo}</div><div class="al-t">${a.tx}</div></div>`).join('');
+  document.getElementById('det-content').innerHTML=`
+    <div class="det-name">${p.nome}</div>
+    <div class="det-op">${p.op} · <span class="badge ${s.cls}">${tmap[p.status]}</span></div>
+    <div class="det-sec">
+      <div class="det-sec-t">Processo</div>
+      <div style="font-size:11px;font-family:monospace;color:var(--text3);background:var(--ice);padding:4px 8px;border-radius:4px;display:inline-block;margin-bottom:10px">${p.proc} · ${p.vara}</div>
+      ${decs||'<div style="font-size:12px;color:var(--text3)">Ação a ser ajuizada.</div>'}
+    </div>
+    <div class="det-sec">
+      <div class="det-sec-t">Cartas de resultado</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">
+        ${p.crs.cumpridas>0?`<span class="pill p-c">${p.crs.cumpridas} cumpridas</span>`:''}
+        ${p.crs.regularizadas>0?`<span class="pill p-r">${p.crs.regularizadas} regularizadas</span>`:''}
+        ${p.crs.descumpridas>0?`<span class="pill p-d">${p.crs.descumpridas} descumpridas</span>`:''}
+        ${p.crs.irregulares>0?`<span class="pill p-i">${p.crs.irregulares} irregulares</span>`:''}
+        ${p.crs.espera>0?`<span class="pill p-e">${p.crs.espera} aguardando</span>`:''}
+      </div>
+      <div class="det-grid">
+        <div class="dg"><div class="dg-l">Recuperado</div><div class="dg-v" style="color:${p.vRec>0?'var(--teal)':'var(--text3)'}">${p.vRec>0?fmt(p.vRec):'Em apuração'}</div></div>
+        <div class="dg"><div class="dg-l">Recuperável</div><div class="dg-v" style="color:${p.vRecup>0?'var(--red)':'var(--text3)'}">${p.vRecup>0?fmt(p.vRecup):'—'}</div></div>
+        ${p.vGlosa>0?`<div class="dg" style="grid-column:1/-1"><div class="dg-l">Glosa contratual</div><div class="dg-v" style="color:var(--amber)">${fmt(p.vGlosa)}</div></div>`:''}
+      </div>
+    </div>
+    <div class="det-sec">
+      <div class="det-sec-t">Análise e providências</div>
+      ${analise}
+    </div>
+  `;
+  document.getElementById('overlay').classList.add('on');
+}
+function closeD(){document.getElementById('overlay').classList.remove('on')}
+
+function buildImpact(){
+  const comVal=PACS.filter(p=>p.vRec>0||p.vRecup>0).sort((a,b)=>(b.vRec+b.vRecup)-(a.vRec+a.vRecup));
+  const max=Math.max(...comVal.map(p=>p.vRec+p.vRecup),1);
+  document.getElementById('impact-chart').innerHTML=`
+    <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)"><div style="width:12px;height:6px;background:var(--teal);border-radius:3px"></div>Recuperado</div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)"><div style="width:12px;height:6px;background:var(--amber-bg);border:1px solid var(--amber);border-radius:3px"></div>Recuperável</div>
+    </div>
+    ${comVal.map(p=>`<div class="impact-row">
+      <div class="impact-name" title="${p.nome}">${p.nome.split(' ')[0]}</div>
+      <div class="impact-bars">
+        ${p.vRec>0?`<div class="bar-track"><div class="bar-fill bar-rec" style="width:${(p.vRec/max*100).toFixed(1)}%"></div></div>`:''}
+        ${p.vRecup>0?`<div class="bar-track"><div class="bar-fill bar-recup" style="width:${(p.vRecup/max*100).toFixed(1)}%"></div></div>`:''}
+      </div>
+      <div class="impact-vals">${fmtk(p.vRec)}</div>
+    </div>`).join('')}
+    ${PACS.filter(p=>p.vRec===0&&p.vRecup===0).length>0?`<div style="font-size:11px;color:var(--text3);margin-top:8px">${PACS.filter(p=>p.vRec===0&&p.vRecup===0).length} pacientes com valores em atualização pela gestora.</div>`:''}
+  `;
+}
+
+function buildChartTimeline(){
+  // Linha do tempo: meses e valores acumulados recuperados
+  const meses=['nov/24','dez/24','jan/25','fev/25','mar/25','abr/25','mai/25','jun/25','jul/25','ago/25','set/25','out/25','nov/25','dez/25','jan/26','fev/26','mar/26','abr/26'];
+  // Nelma: regularizações começaram ago/25 (17 CRs distribuídas ago/25-abr/26)
+  // Aprox ~60k/mês nas 17 regularizadas = 1.02M total
+  // Luccas: 83 regularizadas de forma mais antiga, vRec=2.59M
+  // André: 13 reg a partir de ~nov/25 = 105k
+  // Samuel: 11 reg = 160k
+  const nelma  =[0,0,0,0,0,0,0,0,60000,120000,181000,242000,303000,424000,545000,666000,847000,1020000];
+  const luccas =[200000,400000,600000,800000,1000000,1200000,1400000,1600000,1800000,2000000,2100000,2200000,2350000,2450000,2520000,2570000,2585000,2594000];
+  const andre  =[0,0,0,0,0,0,0,0,0,0,0,20000,50000,75000,90000,105000,105000,105000];
+  const samuel =[0,0,0,0,0,0,0,0,0,0,0,40000,80000,120000,140000,155000,160000,160000];
+  const total  =meses.map((_,i)=>nelma[i]+luccas[i]+andre[i]+samuel[i]);
+  new Chart(document.getElementById('chart-timeline'),{type:'line',data:{labels:meses,datasets:[
+    {label:'Total acumulado',data:total,borderColor:'#15957E',backgroundColor:'rgba(21,149,126,0.08)',fill:true,tension:0.4,borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#15957E'},
+    {label:'Nelma',data:nelma,borderColor:'#8BBD64',backgroundColor:'transparent',tension:0.4,borderWidth:1.5,pointRadius:2,borderDash:[4,2]},
+    {label:'Luccas',data:luccas,borderColor:'#435C2F',backgroundColor:'transparent',tension:0.4,borderWidth:1.5,pointRadius:2,borderDash:[4,2]},
+    {label:'André',data:andre,borderColor:'#EF9F27',backgroundColor:'transparent',tension:0.4,borderWidth:1.5,pointRadius:2,borderDash:[4,2]},
+    {label:'Samuel',data:samuel,borderColor:'#378ADD',backgroundColor:'transparent',tension:0.4,borderWidth:1.5,pointRadius:2,borderDash:[4,2]}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10},padding:10,boxWidth:12}},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': R$ '+(c.raw/1000).toFixed(0)+'k'}}},scales:{x:{ticks:{font:{family:'Poppins',size:10},maxRotation:45}},y:{ticks:{font:{family:'Poppins',size:10},callback:v=>'R$ '+(v/1000000).toFixed(1)+'M'}}}}});
+}
+
+function buildChartAntesDepois(){
+  const lbls=['Nelma','Luccas','André','Samuel'];
+  const antes=[221147,234226,0,0];
+  const depois=[1187623,2594532,105267,160156];
+  new Chart(document.getElementById('chart-antes-depois'),{type:'bar',data:{labels:lbls,datasets:[{label:'Reembolso original',data:antes,backgroundColor:'rgba(180,178,169,.5)',borderColor:'#B4B2A9',borderWidth:1,borderRadius:4},{label:'Após intervenção judicial',data:depois,backgroundColor:'rgba(21,149,126,.8)',borderColor:'#15957E',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10},padding:10,boxWidth:10}}},scales:{x:{ticks:{font:{family:'Poppins',size:10}}},y:{ticks:{font:{family:'Poppins',size:10},callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}});
+}
+
+function buildValoresMetrics(){
+  const vT=PACS.reduce((a,p)=>a+p.vRec,0);
+  const vRp=PACS.reduce((a,p)=>a+p.vRecup,0);
+  const vG=PACS.reduce((a,p)=>a+p.vGlosa,0);
+  const nReg=PACS.reduce((a,p)=>a+p.crs.regularizadas,0);
+  document.getElementById('met-valores').innerHTML=`
+    <div class="m-card"><div class="m-label">Total recuperado</div><div class="m-val" style="color:var(--teal);font-size:16px">${fmt(vT)}</div><div class="m-sub">${nReg} CRs regularizadas</div></div>
+    <div class="m-card"><div class="m-label">Total recuperável</div><div class="m-val" style="color:var(--red);font-size:16px">${fmt(vRp)}</div><div class="m-sub">descumpridas — em aberto</div></div>
+    <div class="m-card"><div class="m-label">Glosa contratual</div><div class="m-val" style="color:var(--amber);font-size:16px">${fmt(vG)}</div><div class="m-sub">limite contratual — apurado</div></div>
+    <div class="m-card"><div class="m-label">Pacientes com valores</div><div class="m-val">${PACS.filter(p=>p.vRec>0).length}</div><div class="m-sub">de ${PACS.length} total</div></div>
+  `;
+}
+
+function buildSeguranca(){
+  const ac2=ACORDAOS.filter(a=>a.inst==='2ª');
+  const ac1=ACORDAOS.filter(a=>a.inst==='1ª');
+  const fav2=ac2.filter(a=>a.res==='fav').length;
+  const par2=ac2.filter(a=>a.res==='par').length;
+  const def2=ac2.filter(a=>a.res==='def').length;
+  const sf2=ac2.filter(a=>a.adv==='SF').length;
+  const t3=ac2.filter(a=>a.adv==='3º').length;
+  const fav1=ac1.filter(a=>a.res==='fav').length;
+
+  // NÚMEROS GERAIS
+  document.getElementById('jur-nums').innerHTML=`
+    <div class="jur-card"><div class="jur-n" style="color:var(--teal)">${fav2+fav1}</div><div class="jur-l">Decisões favoráveis</div><div class="jur-sub">1ª e 2ª instâncias</div></div>
+    <div class="jur-card"><div class="jur-n" style="color:#EF9F27">${par2}</div><div class="jur-l">Parcialmente favoráveis</div><div class="jur-sub">ilícito reconhecido (2ª inst.)</div></div>
+    <div class="jur-card"><div class="jur-n" style="color:var(--red)">${def2}</div><div class="jur-l">Desfavoráveis</div><div class="jur-sub">tutela negada — mérito aberto</div></div>
+    <div class="jur-card"><div class="jur-n" style="color:var(--green-dark)">${sf2}</div><div class="jur-l">Casos Silva Filho</div><div class="jur-sub">de ${ac2.length} acórdãos em 2ª inst.</div></div>
+    <div class="jur-card"><div class="jur-n" style="color:var(--text3)">${t3}</div><div class="jur-l">Casos de terceiros</div><div class="jur-sub">monitorados pelo escritório</div></div>
+  `;
+
+  // GRÁFICOS
+  new Chart(document.getElementById('chart-jur-res'),{type:'doughnut',data:{labels:['Favorável','Parcialmente favorável','Desfavorável'],datasets:[{data:[fav2,par2,def2],backgroundColor:['#15957E','#EF9F27','#c0392b'],borderWidth:2,borderColor:'#fff',hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:11},padding:12,boxWidth:12}}}}});
+  new Chart(document.getElementById('chart-jur-adv'),{type:'bar',data:{labels:['Silva Filho','Outros advogados'],datasets:[{label:'Favoráveis',data:[ac2.filter(a=>a.adv==='SF'&&a.res==='fav').length,ac2.filter(a=>a.adv==='3º'&&a.res==='fav').length],backgroundColor:'#15957E',borderRadius:5},{label:'Parciais/Desfav.',data:[ac2.filter(a=>a.adv==='SF'&&a.res!=='fav').length,ac2.filter(a=>a.adv==='3º'&&a.res!=='fav').length],backgroundColor:'rgba(21,149,126,.25)',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10},padding:10,boxWidth:10}}},scales:{x:{ticks:{font:{family:'Poppins',size:11}}},y:{ticks:{font:{family:'Poppins',size:10},stepSize:1}}}}});
+
+  // PANORAMA GEOGRÁFICO — 1ª INSTÂNCIA
+  const raData={
+    'Planaltina':     {nivel:'alta',   cor:'var(--teal)',   casos:[{num:'0708267',adv:'SF',tipo:'Liminar',res:'fav',op:'Bradesco',obs:'Tutela obtida — vedação código 150/151 expressa'}],nota:'Vara Única favorável ao beneficiário. Liminar deferida em caráter liminar, pendente sentença.'},
+    'Núcleo Bandeirante':{nivel:'alta',cor:'var(--teal)',   casos:[{num:'0703328',adv:'SF',tipo:'Liminar+Sent.',res:'fav',op:'Bradesco',obs:'Liminar + sentença favoráveis'},{num:'0704039',adv:'SF',tipo:'Liminar+Sent.',res:'fav',op:'Sul América',obs:'Liminar + sentença favoráveis'}],nota:'Vara Única com duas decisões favoráveis — Bradesco e Sul América. Sentença paradigma obtida.'},
+    'Ceilândia':      {nivel:'alta',   cor:'var(--teal)',   casos:[{num:'0735696',adv:'SF',tipo:'Liminar',res:'fav',op:'Bradesco',obs:'Tutela obtida — pacote genérico vedado'}],nota:'1ª Vara Cível favorável. Liminar em vigor.'},
+    'Gama':           {nivel:'alta',   cor:'var(--teal)',   casos:[{num:'0715469',adv:'SF',tipo:'Liminar',res:'fav',op:'Bradesco',obs:'Liminar técnica — veda código 151, média de rede e UR/CR'},{num:'0707048',adv:'SF',tipo:'Liminar',res:'fav',op:'Sul América',obs:'Conta aberta exigida — Juíza Adriana Tapety'}],nota:'1ª e 2ª Varas Cíveis — duas liminares favoráveis. Decisões contra Bradesco e Sul América.'},
+    'São Sebastião':  {nivel:'alta',   cor:'var(--teal)',   casos:[{num:'0703032',adv:'SF',tipo:'Liminar',res:'fav',op:'Bradesco',obs:'Liminar após reconsideração'}],nota:'2ª Vara Cível favorável. Liminar obtida após reconsideração do próprio juízo.'},
+    'Brasília':       {nivel:'media',  cor:'#EF9F27',       casos:[{num:'0736445',adv:'SF',tipo:'Sent.',res:'fav',op:'Cassi',obs:'Sentença + acórdão favorável — 23ª Vara'},{num:'0759202',adv:'SF',tipo:'Sent.',res:'fav',op:'Bradesco',obs:'Sentença paradigma — 23ª Vara'},{num:'0764975',adv:'SF',tipo:'Liminar',res:'fav',op:'Sul América',obs:'Liminar — 23ª Vara'},{num:'0730083',adv:'SF',tipo:'Sent.',res:'par',op:'Sul América',obs:'Parcial — 20ª Vara'},{num:'0742129',adv:'SF',tipo:'Perícia',res:'cur',op:'Amil',obs:'Sem tutela — 18ª Vara. Perícia em curso'}],nota:'Múltiplas varas. 23ª Vara: consolidada como favorável (3 decisões positivas). 20ª Vara: parcial. 18ª Vara: sem liminar (Amil — dilação probatória). Resultado depende da vara.'},
+  };
+
+  const nivelLabel={alta:'Alta segurança',media:'Segurança parcial — depende da vara',baixa:'Atenção'};
+  const nivelBadge={alta:'b-fav',media:'b-par',baixa:'b-par'};
+
+  document.getElementById('ra-geo').innerHTML=Object.entries(raData).map(([ra,d])=>`
+    <div style="background:var(--white);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;background:var(--ice)" onclick="toggleRA('ra-${ra.replace(/\s/g,'_')}')">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${d.cor};flex-shrink:0"></div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--green-dark)">${ra}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px">${d.nota}</div>
+          </div>
+        </div>
+        <span class="badge ${nivelBadge[d.nivel]}" style="flex-shrink:0;margin-left:10px">${nivelLabel[d.nivel]}</span>
+      </div>
+      <div id="ra-${ra.replace(/\s/g,'_')}" style="display:none;padding:10px 16px">
+        ${d.casos.map(c=>`
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:0.5px solid var(--border)">
+            <span style="font-size:10px;font-family:monospace;color:var(--text3);min-width:80px;flex-shrink:0">${c.num}</span>
+            <span class="badge ${c.adv==='SF'?'b-fav':'b-cur'}" style="flex-shrink:0">${c.adv==='SF'?'Silva Filho':'Terceiros'}</span>
+            <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${c.res==='fav'?'var(--teal-light)':c.res==='par'?'var(--amber-bg)':'var(--red-bg)'};color:${c.res==='fav'?'var(--teal)':c.res==='par'?'var(--amber)':'var(--red)'};flex-shrink:0">${c.tipo}</span>
+            <div>
+              <div style="font-size:11px;font-weight:500;color:var(--text)">${c.op}</div>
+              <div style="font-size:11px;color:var(--text3)">${c.obs}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  // 2ª INSTÂNCIA — TURMAS
+  const turmaData={
+    '5ª T.':{rels:['Alfeu Machado','Carmen Bittencourt','Vera Andrighi','Eustáquio','James','Bessa','Lucimeira'],fav:8,par:0,def:0,adv:'SF',obs:'Turma mais favorável da carteira. 8 acórdãos favoráveis em casos Silva Filho. Posição consolidada: alteração unilateral é vedada.'},
+    '2ª T.':{rels:['Ciarlini'],fav:2,par:0,def:0,adv:'SF',obs:'2 acórdãos favoráveis (Cassi e Bradesco). Ciarlini: cláusula duvidosa pró-aderente (art. 423 CC). Posição sólida.'},
+    '4ª T.':{rels:['Aiston','Sérgio Rocha'],fav:1,par:2,def:0,adv:'SF+3º',obs:'Posição intermediária. Aiston: reconhece o ilícito mas não condena (embargos pendentes). Sérgio Rocha (3º): favorável quando operadora não apresenta tabela. Evolução em curso.'},
+    '7ª T.':{rels:['Sandra Reves'],fav:0,par:0,def:1,adv:'SF',obs:'Único acórdão desfavorável da carteira (Amil). Sandra Reves: tutela negada por dilação probatória. Mérito aberto — não é derrota definitiva.'},
+    '1ª T.':{rels:['Fabrício Fontoura','Teófilo'],fav:2,par:0,def:0,adv:'3º',obs:'Casos de terceiros. Fabrício Fontoura: operadora sem tabela perde limite. Teófilo: prótese customizada — reembolso integral. Favoráveis ao beneficiário.'},
+    '8ª T.':{rels:['Teófilo','Carmen'],fav:1,par:1,def:0,adv:'3º',obs:'Casos de terceiros. Teófilo: favorável (tabela). Carmen: parcial (reembolso integral só em urgência/ausência de rede).'},
+    '3ª T.':{rels:['Luís Gustavo'],fav:0,par:0,def:1,adv:'3º',obs:'Caso de terceiro — contexto diferente (parto domiciliar). Não afeta a matéria de hemodiálise diretamente.'},
+    '1ª TR':{rels:['Fernandes da Luz'],fav:1,par:0,def:0,adv:'3º',obs:'Turma Recursal. CNES não exigível para reembolso — favorável.'},
+    '2ª TR':{rels:['Marília Sampaio'],fav:1,par:0,def:0,adv:'3º',obs:'Turma Recursal. INAS/urgência — reembolso obrigatório + dano moral.'},
+    '3ª TR':{rels:['Margareth Becker'],fav:1,par:0,def:0,adv:'3º',obs:'Turma Recursal. Distinção expressa do Tema 1375 STJ — favorável.'},
+    '1ª Câm.':{rels:['Altair Guerra'],fav:1,par:0,def:0,adv:'SF',obs:'TJGO. Decisão mais completa da carteira: código 151 abusivo + Brasíndice/Simpro + autonomia médica + superação do NATJUS.'},
+  };
+
+  document.getElementById('turmas-sec').innerHTML=Object.entries(turmaData).map(([t,d])=>{
+    const total=d.fav+d.par+d.def;
+    const nivelT=d.fav===total&&total>0?'alta':d.fav>0?'media':'baixa';
+    const nivelCorT={alta:'var(--teal)',media:'#EF9F27',baixa:'var(--red)'};
+    return `
+    <div style="background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:14px 16px;margin-bottom:8px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <div style="width:8px;height:8px;border-radius:50%;background:${nivelCorT[nivelT]};flex-shrink:0"></div>
+            <span style="font-size:13px;font-weight:600;color:var(--green-dark)">${t}</span>
+            <span style="font-size:10px;color:var(--text3)">${d.rels.join(' · ')}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;margin-left:16px">${d.obs}</div>
+        </div>
+        <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+          ${d.fav>0?`<span class="badge b-fav">${d.fav} fav.</span>`:''}
+          ${d.par>0?`<span class="badge b-par">${d.par} parc.</span>`:''}
+          ${d.def>0?`<span class="badge" style="background:var(--red-bg);color:var(--red)">${d.def} desfav.</span>`:''}
+          <span class="badge ${d.adv==='SF'?'b-fav':d.adv==='3º'?'b-cur':'b-par'}" style="margin-left:4px">${d.adv==='SF'?'Silva Filho':d.adv==='3º'?'Terceiros':'SF + 3º'}</span>
+        </div>
+      </div>
+    </div>`;}).join('');
+
+  document.getElementById('args-list').innerHTML=`
+    <div class="alerta a-ok" style="margin-bottom:8px"><div class="al-l">Alteração unilateral — vedada</div><div class="al-t">A substituição do método Brasíndice/Simpro por código genérico de "pacote" configura alteração unilateral do contrato, expressamente vedada pela Lei 9.656/98 e pelo CDC. Posição consolidada nas turmas do TJDFT, com 8 acórdãos favoráveis apenas na 5ª Turma.</div></div>
+    <div class="alerta a-ok" style="margin-bottom:8px"><div class="al-l">Autonomia médica — o médico define, não a operadora</div><div class="al-t">O médico assistente tem autonomia para indicar os materiais e medicamentos necessários à hemodiálise. A operadora não pode substituir essa prescrição por um pacote genérico sem violar a autonomia profissional — posição reforçada pelo STJ (REsp 2.079.392) e pelo TJGO (acórdão Altair Guerra).</div></div>
+    <div class="alerta a-ok" style="margin-bottom:8px"><div class="al-l">Dever de discriminar — transparência obrigatória</div><div class="al-t">Mesmo onde há previsão de pacote no contrato, a operadora tem o dever de discriminar cada item reembolsado (honorários, materiais, medicamentos) de forma transparente. A 1ª e 4ª Turmas do TJDFT confirmam: a operadora que não apresenta sua tabela contratual perde o direito de limitar o reembolso.</div></div>
+    <div class="alerta a-note" style="margin-bottom:8px"><div class="al-l">Nota — Tema 1375 STJ (suspenso)</div><div class="al-t">O STJ analisa um tema sobre reembolso em livre escolha de prestador. Os casos dos pacientes <strong>não são</strong> de livre escolha: são de descumprimento do próprio contrato pela rede credenciada. A 3ª Turma Recursal do TJDFT já fez essa distinção expressamente. O escritório mantém essa diferenciação em todos os recursos.</div></div>
+  `;
+}
+function toggleRA(id){const el=document.getElementById(id);el.style.display=el.style.display==='none'?'block':'none'}
+
+function buildGlossario(){
+  const termos=[
+    {t:'Liminar',d:'Decisão judicial urgente e provisória, concedida antes do julgamento final do processo. Quando favorável, a operadora é obrigada a cumprir imediatamente, sob pena de multa.'},
+    {t:'Acórdão',d:'Decisão de um tribunal (como o TJDFT), proferida por um colegiado de desembargadores — não apenas um juiz. Tem mais peso que uma sentença de 1ª instância.'},
+    {t:'Carta de resultado (CR)',d:'Resposta formal da operadora a cada solicitação de reembolso. Pode ser "cumprida" (paga corretamente), "irregular" (subdimensionada), "descumprida" (ordem judicial ignorada) ou "regularizada" (corrigida após reapresentação).'},
+    {t:'Brasíndice/Simpro',d:'Tabelas de referência utilizadas para precificar materiais e medicamentos hospitalares. O contrato original prevê reembolso com base nessas tabelas — as operadoras tentam substituí-las por pacotes genéricos de valor menor.'},
+    {t:'Pacote / Código 150-151',d:'Método de reembolso que colapsa todos os itens de uma sessão de hemodiálise num valor único e genérico, sem discriminar honorários, materiais e medicamentos. É considerado abusivo pelo TJDFT quando substitui a metodologia contratual.'},
+    {t:'Reapresentação',d:'Novo pedido de reembolso feito após uma resposta irregular ou descumprida, acompanhado da decisão judicial. Se a operadora reembolsar corretamente, a CR é "regularizada".'},
+    {t:'Valor recuperável',d:'Diferença entre o que deveria ter sido reembolsado e o que a operadora efetivamente pagou, nas cartas ainda descumpridas. Representa o potencial de recuperação pendente.'},
+    {t:'Glosa contratual',d:'Parte da fatura que a operadora legitimamente não é obrigada a pagar, conforme os limites do próprio contrato. Diferente do subdimensionamento ilegal — a glosa contratual é esperada e aceita.'},
+    {t:'AI (Agravo de Instrumento)',d:'Recurso urgente contra uma decisão interlocutória (como uma liminar). Quando a operadora pede para suspender uma liminar favorável ao paciente, isso é um AI. Se o tribunal nega o pedido, a liminar se mantém.'},
+    {t:'Embargos de declaração',d:'Recurso que pede ao mesmo julgador que esclareça contradições, omissões ou obscuridades em sua decisão. Usado quando uma decisão reconhece um ilícito mas não extrai a consequência prática (condenação).'},
+    {t:'Autogestão (ex: Cassi)',d:'Operadora de saúde gerida pelos próprios beneficiários (ex: funcionários de um banco). O Código de Defesa do Consumidor não se aplica diretamente, mas o contrato deve ser interpretado de forma transparente e equitativa.'},
+    {t:'TJDFT / TJGO',d:'Tribunais de Justiça do Distrito Federal e Territórios e de Goiás, respectivamente. São as instâncias recursais que julgam os casos em 2ª instância — suas decisões formam a jurisprudência local sobre o tema.'}
+  ];
+  document.getElementById('gloss').innerHTML=termos.map(t=>`<div class="gloss-item"><div class="gloss-term">${t.t}</div><div class="gloss-def">${t.d}</div></div>`).join('');
+}
+</script>
+</body>
+</html>
